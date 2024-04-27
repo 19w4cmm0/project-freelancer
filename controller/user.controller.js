@@ -41,8 +41,6 @@ module.exports.login = async (req,res) => {
         });
         return;
     }
-    console.log(password)
-    console.log(user.mat_khau)
     if( password !== user.mat_khau) {
         res.json({
             code: 400,

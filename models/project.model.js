@@ -11,6 +11,10 @@ const projectSchema = new mongoose.Schema(
     thoi_han_du_an: Date,
     han_chot_nop_ho_so: Date,
     id_nha_tuyen_dung: String,
+    id_ung_tuyen: {
+        type: Array,
+        default: []
+    },
     deleted: {
         type: Boolean,
         default: false,

@@ -1,4 +1,5 @@
 const Account = require("../models/account.model")
+const User = require("../models/user.model")
 const Project = require("../models/project.model")
 
 
@@ -77,5 +78,26 @@ module.exports.delete = async (req, res) => {
             code: 400,
             message: "ERROR!"
         })
+    }
+}
+
+// [PATCH] /api/v1/project/ungtuyen/:idProject
+module.exports.add_ung_tuyen = async (req, res) => {
+    try{
+    const id = req.params.idProject;
+    const token = req.cookies.tokenUser;
+    const user = await User.findOne( {token: token})
+    await Project.updateOne({ _id: id}, {$push: { id_ung_tuyen: user.id}})
+
+    res.json({
+        code: 200,
+        message: "Success!"
+    })
+    } catch(err) {
+        res.json({
+            code: 400,
+            message: "ERROR"
+        })
+
     }
 }
