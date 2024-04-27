@@ -1,9 +1,10 @@
-const md5 = require("md5");
+
 const Account = require("../models/account.model")
+const generate = require("../helpers/generate")
 
 // [POST] /api/v1/accounts/register
 module.exports.register = async (req, res) => {
-    req.body.password = md5(req.body.password);
+    req.body.token = generate.generateRandomString(30);
     const existEmail = await Account.findOne({ email: req.body.email, deleted: false});
 
     if(existEmail) {
@@ -12,11 +13,9 @@ module.exports.register = async (req, res) => {
             message: "Email đã tồn tại!"
         })
     } else {
-        const account = new Account({
-            ten_doanh_nghiep: req.body.ten_doanh_nghiep,
-            email: req.body.email,
-            password: req.body.password
-        });
+        
+        console.log(req.body)
+        const account = new Account(req.body);
         account.save();
         const token = account.token;
         res.cookie("tokenAcc", token);
@@ -32,7 +31,7 @@ module.exports.register = async (req, res) => {
 // [POST] /api/v1/accounts/login
 module.exports.login = async (req,res) => {
     const email = req.body.email;
-    const password = req.body.password;
+    const password = req.body.mat_khau;
 
     const account = await Account.findOne({
         email: email
@@ -44,7 +43,7 @@ module.exports.login = async (req,res) => {
         });
         return;
     }
-    if( md5(password) !== account.password) {
+    if( password !== account.mat_khau) {
         res.json({
             code: 500,
             message: "Sai mật khẩu!"
@@ -60,4 +59,23 @@ module.exports.login = async (req,res) => {
         message: "Đăng nhập thành công!",
         tokenAcc: token
     })
+}
+// [GET] /api/v1/users/detail
+module.exports.detail = async (req, res) => {
+    try{
+        const token = req.cookies.tokenAcc;
+        const account = await Account.findOne({ token: token}).select("-passwoard - token");
+        
+        res.json({
+            code: 200,
+            message: "Thành công!",
+            info: account
+        })
+    } catch(err) {
+        res.json({
+            code: 400,
+            message: "ERROR"
+        })
+
+    }
 }

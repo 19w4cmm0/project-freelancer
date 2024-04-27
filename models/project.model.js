@@ -6,10 +6,7 @@ const projectSchema = new mongoose.Schema(
     mo_ta_du_an: String,
     nganh_nghe: String,
     so_luong: Number,
-    ky_nang_can_thiet: {
-        type: Array,
-        default: []
-    },
+    ky_nang_can_thiet: String,
     muc_luong: Number,
     thoi_han_du_an: Date,
     han_chot_nop_ho_so: Date,
@@ -23,6 +20,6 @@ const projectSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-const Project = mongoose.model("Project", projectSchema, "projects");
+const Project = mongoose.model("Project", projectSchema, "duan");
 
 module.exports = Project;

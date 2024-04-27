@@ -1,11 +1,11 @@
-const md5 = require("md5");
+
 const User = require("../models/user.model")
 const generate = require("../helpers/generate")
 
 // [POST] /api/v1/users/register
 module.exports.register = async (req, res) => {
-    req.body.password = md5(req.body.password);
-    const existEmail = await User.findOne({ email: req.body.email, deleted: false});
+    req.body.token = generate.generateRandomString(30);
+    const existEmail = await User.findOne({ email: req.body.email});
 
     if(existEmail) {
         res.json({
@@ -13,20 +13,15 @@ module.exports.register = async (req, res) => {
             message: "Email đã tồn tại!"
         })
     } else {
-        const user = new User({
-            fullName: req.body.fullName,
-            email: req.body.email,
-            password: req.body.password,
-            token: generate.generateRandomString(30)
-        });
+        const user = new User(req.body);
         user.save();
         const token = user.token;
-        res.cookie("token", token);
+        res.cookie("tokenUser", token);
 
         res.json({
             code: 200,
             message: "Đăng ký thành công!",
-            token: token
+            tokenUser: token
         })
     }
 }
@@ -34,7 +29,7 @@ module.exports.register = async (req, res) => {
 // [POST] /api/v1/users/login
 module.exports.login = async (req,res) => {
     const email = req.body.email;
-    const password = req.body.password;
+    const password = req.body.mat_khau;
 
     const user = await User.findOne({
         email: email
@@ -46,7 +41,9 @@ module.exports.login = async (req,res) => {
         });
         return;
     }
-    if( md5(password) !== user.password) {
+    console.log(password)
+    console.log(user.mat_khau)
+    if( password !== user.mat_khau) {
         res.json({
             code: 400,
             message: "Sai mật khẩu!"
@@ -55,7 +52,7 @@ module.exports.login = async (req,res) => {
         return;
     }
     const token = user.token;
-    res.cookie("token", token);
+    res.cookie("tokenUser", token);
 
         res.json({
             code: 200,
@@ -66,8 +63,8 @@ module.exports.login = async (req,res) => {
 // [GET] /api/v1/users/detail
 module.exports.detail = async (req, res) => {
     try {
-        const token = req.cookies.token;
-        const user = await User.findOne({ token: token, deleted: false}).select("-password -token");
+        const token = req.cookies.tokenUser;
+        const user = await User.findOne({ token: token}).select("-password -token");
 
         res.json({
             code: 200,
