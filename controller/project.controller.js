@@ -5,7 +5,17 @@ const Project = require("../models/project.model")
 
 // [GET] api/v1/project
 module.exports.index = async (req, res) => {
-    const project = await Project.find();
+    const q = req.query;
+    const filters = {
+        ...(q.projectId && { _id: q.projectId }),
+        ...(q.nganh_nghe && { nganh_nghe: q.nganh_nghe }),
+        ...((q.min || q.max) && {
+            muc_luong: { ...(q.min && { $gt: q.min }), ...(q.max && { $lt: q.max }) },
+        }),
+        ...(q.search && {ten_du_an: { $regex: q.search, $options: "i" } }),
+    };
+    
+    const project = await Project.find(filters);
     res.json({
         code: 200,
         message: "Get thanh cong!",
