@@ -2,6 +2,7 @@ const userRoutes = require('./user.route')
 const taskRoutes = require('./task.route');
 const accountRoutes = require('./account.route');
 const projectRoutes = require('./project.route');
+const postRoutes = require('./post.route')
 
 
 
@@ -11,4 +12,5 @@ module.exports = (app) => {
     app.use(version + '/users', userRoutes);
     app.use(version + '/accounts', accountRoutes);
     app.use(version + '/project', projectRoutes);
+    app.use(version + "/post", postRoutes);
 }
