@@ -2,9 +2,10 @@ const Post = require("../models/post.model");
 const Account = require("../models/account.model");
 const User = require("../models/user.model");
 
+
+// [GET] /api/v1/post
 module.exports.index = async (req, res) => {
     const post = await Post.find();
-    console.log(post);
     res.json({
         code: 200,
         message: "Success",
@@ -12,6 +13,7 @@ module.exports.index = async (req, res) => {
     });
 }
 
+// [POST] /api/v1/post/create
 module.exports.create = async (req, res) => {
     try {
         if(req.cookies.tokenAcc) {
@@ -28,7 +30,7 @@ module.exports.create = async (req, res) => {
 
             req.body.id_nguoi_tao = user.id;
         }
-        console.log(req.body.id_nguoi_tao)
+
         const post = new Post(req.body);
         await post.save();
 
